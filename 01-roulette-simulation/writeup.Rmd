@@ -235,6 +235,17 @@ walk_out_money <- function(ledger){
 }
 ```
 
+## Replicate
+
+After we have the above code, the last thing we need to do is to replicate, which can be achieved with a for loop:
+
+```{r}
+R <- 100 # number of replicates
+output <- rep(NA,R)
+for(r in 1:R){
+   output[r]=one_series(starting_budget=200,winning_threshold =300,max_games=1000,max_wager =100 ) %>% walk_out_money 
+}
+```
 
 # Discussion
 
@@ -246,18 +257,24 @@ By assigning the initial value to **one_ series()** function, we can get the led
 result= one_series(starting_budget=200, winning_threshold =300,max_games=1000,max_wager =100 )
 head(result)
 ```
-In order to explore the effect of this strategy, we will draw line graph to learn the distribution and changes of players' earnings in a series of games, and calculate the probability of making money leaving and the average earnings:
+
+In order to explore the effect of this strategy, we will draw a line graph to learn the distribution and changes of players' earnings in a series of games:
 
 ```{r}
 earnings=result[,5]-200
 
 plot(earnings,type ="l", main = "Gambler earnings VS. Wager Number", xlab = "Wager Number", ylab = "Earnings")
-
-mean(earnings>0) #probability of making money leaving
-mean(earnings)   #average earnings
 ```
 
-Through these graphs, we can observe how the gambler's earnings change with the game index, and also know the probability of making money leaving and the average earnings. This is helpful in the selection of gambling strategies.
+Through the graph, we can observe how the gambler's earnings change with the game index in one series of play.
+
+For a gambler who repeats the strategy several times, we can calculate its average probability of making money leaving and average earnings:
+```{r}
+mean(output>0)  #probability of making money leaving
+mean(output)    #average earnings
+```
+
+, and also know the probability of making money leaving and the average earnings. This is helpful in the selection of gambling strategies.
 
 ## How does changing one parameter of the simulation affect the average revenue
 
