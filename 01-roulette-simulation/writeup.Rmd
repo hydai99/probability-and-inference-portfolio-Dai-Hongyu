@@ -3,7 +3,7 @@ title: "Martingale Strategy of Roulette"
 author: 'Hongyu Dai'
 date: "Sept 5th, 2021"
 output:
-    html_document:
+  html_document:
     code_folding: hide
     toc: yes
     number_sections: yes
@@ -268,7 +268,7 @@ changes_start_budget <- seq(50,400,50)
 changes_earning <- vector()
 
 for (i in 1:length(changes_start_budget)){
-  changes_earning [i] <- one_series( starting_budget=changes_start_budget[i], winning_threshold =300,max_games=1000,max_wager =100 )  %>% walk_out_money
+  changes_earning [i] <- one_series( starting_budget=changes_start_budget[i], winning_threshold =300,max_games=1000,max_wager =100 )  %>% walk_out_money()
 }
 plot(changes_start_budget,changes_earning, type = "b", xlab= "Change in starting budget", ylab = "Final Earnings")
 ```
@@ -279,7 +279,7 @@ By observing the above figure, we can find that there is no correlation between 
 ## How to estimate the average number of plays before stopping.
 
 ```{r}
-playnumber_before_stopping <- rep(NA, 50)
+playnumber_before_stopping <- rep(NA, 100)
 for(j in seq_along(playnumber_before_stopping)){
   playnumber_before_stopping[j] <- one_series(starting_budget=200, winning_threshold =300,max_games=1000,max_wager =100)  %>% nrow()
    
