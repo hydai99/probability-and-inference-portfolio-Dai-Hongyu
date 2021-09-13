@@ -1,8 +1,8 @@
 # probability-and-inference-portfolio-Dai-Hongyu
 
-[Assignment0](/00-student-profile)
+[Assignment 0](/00-student-profile)
 
-[Assignment1](/01-roulette-simulation)
+[Assignment 1](/01-roulette-simulation)
 
-[Assignment2](/02-monte-carlo-error)
+[Assignment 2](/02-monte-carlo-error)
 
