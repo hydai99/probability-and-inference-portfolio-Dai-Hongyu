@@ -240,7 +240,7 @@ walk_out_money <- function(ledger){
 After we have the above code, the last thing we need to do is to replicate, which can be achieved with a for loop:
 
 ```{r}
-R <- 100 # number of replicates
+R <- 10000 # number of replicates
 output <- rep(NA,R)
 for(r in 1:R){
    output[r]=one_series(starting_budget=200,winning_threshold =300,max_games=1000,max_wager =100 ) %>% walk_out_money 
@@ -278,31 +278,45 @@ mean(output)    #average earnings
 
 ## How does changing one parameter of the simulation affect the average revenue
 
-Many people believe that in a casino, as long as one has enough money, one can be invincible. To investigate this view, next I will assign different values to the Starting budget parameter and observe the affect of a change in the Starting budget parameter on average revenue by drawing a graph：
+Many people believe that in a casino, as long as one has enough money, one can be invincible.
+
+To investigate this view, I will change the starting budget parameter to 50 ~ 400 and simulate it 1000 times to observe the impact of the change of the initial budget parameters on the average income through the line diagram:
 
 ```{r}
+simulation_time <-1000
 changes_start_budget <- seq(50,400,50)
+avg_earning_in_1000 <- vector()
 changes_earning <- vector()
 
 for (i in 1:length(changes_start_budget)){
-  changes_earning [i] <- one_series( starting_budget=changes_start_budget[i], winning_threshold =300,max_games=1000,max_wager =100 )  %>% walk_out_money()
+  for (t in 1:simulation_time){
+    avg_earning_in_1000[t] <- one_series( starting_budget=changes_start_budget[i], winning_threshold =300,max_games=1000,max_wager =100) %>% walk_out_money()}
+  changes_earning[i] <- mean(avg_earning_in_1000)
 }
-plot(changes_start_budget,changes_earning, type = "b", xlab= "Change in starting budget", ylab = "Final Earnings")
+
+plot(changes_start_budget,changes_earning, type = "b", xlab= "Change in starting budget", ylab = "Average Earnings")
 ```
 
-By observing the above figure, we can find that there is no correlation between start budget and earnings.
+By observing the above figure, we can find that there is no correlation between start budget and average earnings.
 
 
 ## How to estimate the average number of plays before stopping.
 
+In this part, I simulate **one_series play** 1000 times to calculate the average number of plays. By counting the number of rows of **one_series play** each time, we can get its number of plays.
+
 ```{r}
-playnumber_before_stopping <- rep(NA, 100)
+set.seed(1)
+playnumber_before_stopping <- rep(NA, 1000)
 for(j in seq_along(playnumber_before_stopping)){
   playnumber_before_stopping[j] <- one_series(starting_budget=200, winning_threshold =300,max_games=1000,max_wager =100)  %>% nrow()
-   
 }
 mean (playnumber_before_stopping)
+hist(playnumber_before_stopping)
 ```
+
+The mean of average plays number is 198.127, which means that in 1000 simulations, gamblers on average ended up gambling on the 198th play - either losing or getting Winnings threshold for stopping
+
+Through the histogram, we can see the distribution of number of plays before stopping in 1000 simulations, and we can find that most of them are concentrated in 0 to 400 times.
 
 # Limitation
 
