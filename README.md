@@ -2,8 +2,8 @@
 
 [Assignment 0](/00-student-profile)
 
-[Assignment 1](/01-roulette-simulation)
+[Assignment 01](/01-roulette-simulation)
 
-[Assignment 2](/02-monte-carlo-error)
+[Assignment 02](/02-monte-carlo-error)
 
-[Assignment 2b](/02b-interview-question)
+[Assignment 02b](/02b-interview-question)
