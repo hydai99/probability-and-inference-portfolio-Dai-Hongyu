@@ -6,3 +6,4 @@
 
 [Assignment 2](/02-monte-carlo-error)
 
+[Assignment 2b](/02b-interview-question)
