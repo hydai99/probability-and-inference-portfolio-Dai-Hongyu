@@ -3,14 +3,13 @@ title: "Birthday Problem"
 author: "Hongyu Dai"
 date: "2021/9/25"
 output:
+  github_document: default
   html_document:
     code_folding: hide
     toc: yes
     number_sections: yes
     toc_depth: 3
     toc_float: yes
-  github_document: default
-
 ---
 
 ```{r global options, include = FALSE}
