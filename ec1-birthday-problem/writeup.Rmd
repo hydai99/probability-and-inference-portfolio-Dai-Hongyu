@@ -3,13 +3,13 @@ title: "Birthday Problem"
 author: "Hongyu Dai"
 date: "2021/9/25"
 output:
-  github_document: default
   html_document:
     code_folding: hide
     toc: yes
     number_sections: yes
     toc_depth: 3
     toc_float: yes
+  github_document: default
 ---
 
 ```{r global options, include = FALSE}
@@ -75,6 +75,7 @@ check_birthday <- function(class){
 4) We calculated class sizes ranging from 1 to 80 students. To ensure the accuracy of the results, the results were averaged after 1000 simulations. Finally we obtained the probability that in a class ranging from 1 to 80 students, the probability that at least two students share a birthday, named as p1.
 
 ```{r}
+set.seed(1)
 p1=vector()
 max_class_size=80
 simulation_times=1000

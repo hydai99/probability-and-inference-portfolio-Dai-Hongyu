@@ -310,7 +310,8 @@ library(ggplot2)</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>We calculated class sizes ranging from 1 to 80 students. To ensure the accuracy of the results, the results were averaged after 1000 simulations. Finally we obtained the probability that in a class ranging from 1 to 80 students, the probability that at least two students share a birthday, named as p1.</li>
 </ol>
-<pre class="r"><code>p1=vector()
+<pre class="r"><code>set.seed(1)
+p1=vector()
 max_class_size=80
 simulation_times=1000
 for (m in 1:max_class_size){
@@ -318,13 +319,13 @@ for (m in 1:max_class_size){
   p1[m]=mean(p)
 }
 p1</code></pre>
-<pre><code>##  [1] 0.000 0.003 0.007 0.014 0.020 0.046 0.053 0.075 0.074 0.100 0.132 0.177
-## [13] 0.215 0.200 0.262 0.279 0.330 0.383 0.377 0.368 0.448 0.518 0.515 0.546
-## [25] 0.558 0.595 0.614 0.664 0.670 0.710 0.740 0.736 0.759 0.791 0.804 0.816
-## [37] 0.835 0.872 0.880 0.899 0.930 0.907 0.936 0.939 0.931 0.947 0.970 0.950
-## [49] 0.957 0.977 0.982 0.987 0.983 0.983 0.983 0.987 0.990 0.994 0.988 0.996
-## [61] 0.995 0.993 0.996 0.998 0.997 0.996 1.000 0.999 1.000 0.999 0.999 1.000
-## [73] 1.000 1.000 1.000 1.000 1.000 1.000 1.000 0.999</code></pre>
+<pre><code>##  [1] 0.000 0.002 0.010 0.017 0.029 0.056 0.065 0.061 0.099 0.122 0.136 0.163
+## [13] 0.169 0.234 0.260 0.260 0.296 0.352 0.400 0.439 0.436 0.468 0.512 0.534
+## [25] 0.553 0.589 0.656 0.613 0.670 0.682 0.714 0.752 0.770 0.797 0.818 0.849
+## [37] 0.844 0.863 0.881 0.877 0.881 0.920 0.938 0.929 0.944 0.961 0.947 0.960
+## [49] 0.962 0.975 0.974 0.982 0.985 0.987 0.991 0.984 0.989 0.990 0.995 0.993
+## [61] 0.994 0.997 0.995 0.997 0.999 0.998 1.000 1.000 0.997 0.998 1.000 1.000
+## [73] 1.000 1.000 0.999 1.000 1.000 1.000 0.999 1.000</code></pre>
 <p>For easy understanding, we show its trend by drawing a scatter plot:</p>
 <pre class="r"><code>ggplot()+
   geom_point(aes(x=1:max_class_size,y=p1))+
