@@ -1,0 +1,183 @@
+---
+title: "Birthday Problem"
+author: "Hongyu Dai"
+date: "2021/9/25"
+output:
+  html_document:
+    code_folding: hide
+    toc: yes
+    number_sections: yes
+    toc_depth: 3
+    toc_float: yes
+  github_document: default
+
+---
+
+```{r global options, include = FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, cache=TRUE)
+```
+
+
+# Introduction
+
+This blog will solve the birthday problem by both Simulation and Analytic solutions and will also compare the pros and cons of the two Solutions. 
+
+The purpose of this blog is to enable students with only basic mathematical knowledge to understand how to solve the problem as well.
+
+# Birthday Problem
+
+## Problem Description
+
+In a class of N individuals, what is the probability that at least two students will share a birthday?
+
+## Assumption
+
+1. A year only has 365 days (ignore leap day).
+
+2. The probability of a birthday is the same on any day of the year.
+
+3. Each student's birthday is independent of the other.
+
+4. Class size: from 1 to 80.
+
+# Solution
+
+## Simulation
+
+1) Import package.
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+2) Generate a class randomly. We will use R to create a class, after we input class size, then we will get each student's id number and Corresponding birthday (crate randomly).
+
+```{r}
+generate_class <- function(class_size){
+  birthdays <- sample(1:365, class_size, replace = TRUE, prob = c(rep(1,365)))
+  data.frame(student_id = 1:class_size, birthday = birthdays)
+}
+```
+
+3) Check whether they have the same birthday. We do a count of the data frame obtained in the second step and calculate the distinct birthday number. if the class size is bigger than the distinct birthday number, it means that there are more than two people sharing birthdays in this class.
+
+```{r}
+check_birthday <- function(class){
+  class_summary <- class %>% 
+    summarize(n = n(), n_bday = n_distinct(birthday)) %>%  
+    #n = class size, n_bday=distinct birthday number
+    mutate(shared = n > n_bday) 
+  class_summary[["shared"]]  
+  #if they are more than 2 people share the same birthday, it will output with TRUE, else FALSE
+}
+```
+
+4) We calculated class sizes ranging from 1 to 80 students. To ensure the accuracy of the results, the results were averaged after 1000 simulations. Finally we obtained the probability that in a class ranging from 1 to 80 students, the probability that at least two students share a birthday, named as p1.
+
+```{r}
+p1=vector()
+max_class_size=80
+simulation_times=1000
+for (m in 1:max_class_size){
+  p <- replicate(simulation_times, m %>% generate_class %>% check_birthday)
+  p1[m]=mean(p)
+}
+p1
+```
+
+For easy understanding, we show its trend by drawing a scatter plot:
+
+```{r}
+ggplot()+
+  geom_point(aes(x=1:max_class_size,y=p1))+
+  geom_hline(aes(yintercept= c(0,1)), linetype="dashed", color = "black")+
+  geom_vline(aes(xintercept=c(1,80)), linetype="dashed", color = "black") +
+  labs(title='Simulation Solution',x='Class Size (from 1 to 80)',y='Probability')  +
+  theme_bw()+
+  theme(panel.grid.major=element_blank(), panel.grid.minor = element_blank())
+
+```
+
+## Analytic
+
+Through Analytic Solution, we can consider this problem from the opposite side:
+
+
+<center>$\textit{P(at least two students share a birthday)} = 1- \textit{P (each student have different birthday)}$</center>
+
+
+The problem turns to how to calculate the probability that each student have different birthday. We assume that the student1's birthday could be anyday of 365 days, then the student2's birthday should be 364 days of 365 days, et cetera. Finally, the student n's birthday should be (365-n+1) days of 365 days. 
+
+Let's multiply these probabilities, we can get:
+
+<center>$\textit{P (each student have different birthday)} = (\frac{365}{365})*(\frac{364}{365})*...*(\frac{365-n+1}{365})=\frac{A_{365}^n}{365^n}=\frac{C_{365}^n}{{365^n}n!}$
+
+$\textit{P(at least two students share a birthday)} = 1- \textit{P (each student have different birthday)} =1-\frac{C_{365}^n}{{365^n}n!}$</center>
+
+Now that we have the formula to calculate the probability, we can calculate it to get the corresponding probabilities for different class sizes from 1 to 80.
+
+Note: To facilitate the distinction, we name the probability here as p2
+
+```{r}
+p2=vector()
+max_class_size=80
+  for (n in 1:max_class_size){
+    p2[n]=1- (factorial(n)*choose(365,n))/((365)^n)
+  }
+p2 
+
+ggplot()+
+  geom_point(aes(x=1:max_class_size,y=p2))+
+  geom_hline(aes(yintercept= c(0,1)), linetype="dashed", color = "black")+
+  geom_vline(aes(xintercept=c(1,80)), linetype="dashed", color = "black") +
+  labs(title='Analytic Solution',x='Class Size (from 1 to 80)',y='Probability')  +
+  theme_bw()+
+  theme(panel.grid.major=element_blank(), panel.grid.minor = element_blank())
+```
+
+
+# Compare
+
+Compare the scatter plots obtained by the two solutions:
+
+```{r}
+ggplot()+
+  geom_point(aes(x=1:max_class_size,y=p1,color='Simulation Solution'))+
+  geom_point(aes(x=1:max_class_size,y=p2,color='Analytic Solution'))+
+  geom_hline(aes(yintercept= c(0,1)), linetype="dashed", color = "black")+
+  geom_vline(aes(xintercept=c(1,80)), linetype="dashed", color = "grey") +
+  labs(title='Probability that at least two students share a birthday',subtitle='In a class of N individuals',x='Class Size (from 1 to 80)',y='Probability',color='Solution')  +
+  theme_bw()+
+  theme(panel.grid.major=element_blank(), panel.grid.minor = element_blank())
+```
+
+We can find that they each have certain pros and cons.
+
+## Simulation Solution
+
+Pros
+
++ Study the behavior of a class without building it.
+
++ Results are accurate in general, compared to analytical model.
+
+Cons
+
++ Large time cost
+
++ Since the birthdays are generated randomly, the randomness is large and sometimes it is difficult to interpret the simulation results.
+
++ When the number of simulations is small, the results tend to have large errors. As the number of simulations increases, the accuracy improves
+
+## Analytic Solution
+
+Pros
+
++ Fast running speed
+
++ Accurate results
+
+Cons
+
++ Requires user to have probability theory knowledge
