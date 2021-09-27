@@ -7,3 +7,7 @@
 [Assignment 02](/02-monte-carlo-error)
 
 [Assignment 02b](/02b-interview-question)
+
+[Assignment 03](/03-discrete-probability-Calculations)
+
+[Assignment EC1](/ec1-birthday-problem)
