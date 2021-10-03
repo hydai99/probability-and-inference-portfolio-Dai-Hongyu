@@ -11,3 +11,5 @@
 [Assignment 03](/03-discrete-probability-Calculations)
 
 [Assignment EC1](/ec1-birthday-problem)
+
+[Assignment 04](/04-home-field-advantage)
