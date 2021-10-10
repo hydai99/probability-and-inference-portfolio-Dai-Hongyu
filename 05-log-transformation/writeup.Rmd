@@ -1,0 +1,337 @@
+---
+title: "Log Transform"
+author: "Hongyu Dai"
+date: "2021/10/8"
+output: 
+  html_document:
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+# Introduction
+
+It is common in the analysis of biological data to log transform data representing concentrations or data representing dose response.
+
+In this blog, I am to answer a series of questions related to the transformation of data. I will use both analytic methods and simulation to answer the questions.
+
+# Setup
+
+1. Geometic Means = $\sqrt[n]{x_1 \cdot x_2 \cdots x_n}$. The sample size used subsequently in this blog is too large for the formula to be used in R, so I will use the logarithm first and then exponentiate to calculate the geometric mean
+
+# Part 1
+
+## Question
+
+1. For each distribution below, generate a figure of the PDF and CDF, and mark the mean and median in the figure.
+
+2. For each distribution below, generate a figure of the PDF and CDF of the transformation Y = log(X) random variable. And mark the mean and median in the figure. By using simulation methods in order find the PDF and CDF of the transformation.
+
+3. For each of the distributions below, generate 1000 samples of size 100. And calculate the geometric and arithmetic mean for each sample. Generate a scatter plot of the geometic and arithmetic sample means. Add the line of identify as a reference line.
+
+4. Generate a histogram of the difference between the arithmetic mean and the geometric mean.
+
+## Answer
+
+### Distribution 1
+
+*X* ∼ GAMMA(shape = 3, scale = 1)
+
+1. For Gamma distribution,
+
+$$Mean = Shape*Scale$$
+
+```{r}
+x = seq(0, 10, by = 0.01)
+mean1 <- 3*1
+median1 <- qgamma(0.5,shape = 3, scale = 1)
+```
+
+```{r}
+pdf1 <- dgamma(x, shape = 3, scale = 1)
+
+# plot pdf figure
+plot(x,pdf1,main='Gamma Distribution\'s PDF figure',type='l')
+abline(v=mean1,col='red') 
+abline(v=median1,col='blue',lty=2)
+legend("topright",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+```
+
+```{r}
+cdf1 <- pgamma(x, shape = 3, scale = 1)
+
+# plot cdf figure
+plot(x,cdf1,main='Gamma Distribution\'s CDF figure',type='l')
+abline(v=mean1,col='red') 
+abline(v=median1,col='blue',lty=2)
+legend("topright",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+```
+
+2.
+
+```{r}
+gamma2<-function(times,shape, scale,title1,title2){
+X <- rgamma(times,shape, scale)
+Y <- log(X)
+plot(density(Y),type='l',main=title1,sub='when Y=log(X)')
+abline(v=mean(Y),col='red') 
+abline(v=median(Y),col='blue',lty=2)
+legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+
+plot(ecdf(Y),main=title2)
+abline(v=mean(Y),col='red') 
+abline(v=median(Y),col='blue',lty=2)
+legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+}
+
+gamma2(1000,3,1,title1='GAMMA Distribution\'s PDF figure',title2='GAMMA Distribution\'s CDF figure')
+```
+
+3 & 4.
+
+```{r}
+gamma34<-function(n,size,shape, scale){
+
+x=as.data.frame(replicate(n,rgamma(size,shape, scale)))
+
+# arithmetic mean & ge mean
+ar_mean <- colMeans(x)
+ge_mean <- exp(colMeans(log(x))) 
+
+plot(x=ar_mean,y=ge_mean,main='Arithmetic Mean VS Geometric Mean ',xlab = "Arithmetic Mean",  ylab = "Geometric Mean ")
+abline(0,1,col='red')
+
+hist(ar_mean-ge_mean,main= 'The Difference between arithmetic mean & geometric mean',xlab='Difference: Arithmetic Mean - Geometric Mean')
+}
+
+gamma34(1000,size=100,shape = 3, scale = 1)
+```
+
+
+### Distribution 2
+
+*X* ∼ LOG NORMAL(*μ* =  − 1, *σ* = 1)
+
+1. For log normal distribution,
+
+$$Mean=exp(μ+σ^2/2)$$
+
+$$Median=exp(μ)$$
+
+```{r}
+x2<-seq(0,5,0.01)
+mean2<-exp(-1+1^2/2)
+median2<-exp(-1)
+```
+
+```{r}
+pdf2 <- dlnorm(x2,-1,1)
+
+plot(x2,pdf2,main='LOG NORMAL Distribution\'s PDF figure',type='l')
+abline(v=mean2,col='red') 
+abline(v=median2,col='blue',lty=2)
+legend("topright",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+```
+
+```{r}
+cdf2 <- plnorm(x2,-1,1)
+
+plot(x2,cdf2,main='LOG NORMAL Distribution\'s CDF figure',type='l')
+abline(v=mean2,col='red') 
+abline(v=median2,col='blue',lty=2)
+legend("bottomright",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+```
+
+2.
+
+```{r}
+lnorm2<-function(times,μ,σ,title1,title2){
+X <- rlnorm(times,μ,σ)
+Y <- log(X)
+plot(density(Y),type='l',main=title1,sub='when Y=log(X)')
+abline(v=mean(Y),col='red') 
+abline(v=median(Y),col='blue',lty=2)
+legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+
+plot(ecdf(Y),main=title2)
+abline(v=mean(Y),col='red') 
+abline(v=median(Y),col='blue',lty=2)
+legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+}
+
+lnorm2(1000,-1,1,title1='Log NORMA Distribution\'s PDF figure',title2='Log NORMA Distribution\'s CDF figure')
+```
+
+3 & 4.
+
+```{r}
+lnorm34<-function(n,size,μ,σ){
+
+x=as.data.frame(replicate(n,rlnorm(size,μ,σ)))
+
+# arithmetic mean & ge mean
+ar_mean <- colMeans(x)
+ge_mean <- exp(colMeans(log(x))) 
+
+plot(x=ar_mean,y=ge_mean,main='Arithmetic Mean VS Geometric Mean ',xlab = "Arithmetic Mean",  ylab = "Geometric Mean ")
+abline(0,1,col='red')
+
+hist(ar_mean-ge_mean,main= 'The Difference between arithmetic mean & geometric mean',xlab='Difference: Arithmetic Mean - Geometric Mean')
+}
+
+lnorm34(1000,size=100,μ=-1,σ=1)
+```
+
+### Distribution 3
+
+*X* ∼ UNIFORM(0, 12)
+
+1. For uniform distribution, 
+
+$$Mean=\frac{a+b}{2}$$
+
+```{r}
+x3 <- seq(-2,14,0.01)
+mean3 <- (0+12)/2
+median3 <-qunif(0.5,0,12)
+```
+
+```{r}
+pdf3 <- dunif(x3,0,12)
+
+plot(x3,pdf3,main='UNIFORM Distribution\'s PDF figure',type='l')
+abline(v=mean3,col='red') 
+abline(v=median3,col='blue',lty=2)
+legend("topright",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+```
+
+```{r}
+cdf3 <- punif(x3,0,12)
+
+plot(x3,cdf3,main='UNIFORM Distribution\'s CDF figure',type='l')
+abline(v=mean3,col='red') 
+abline(v=median3,col='blue',lty=2)
+legend("bottomright",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+```
+
+2.
+
+```{r}
+unif2<-function(times,a,b,title1,title2){
+X <- runif(times,a,b)
+Y <- log(X)
+plot(density(Y),type='l',main=title1,sub='when Y=log(X)')
+abline(v=mean(Y),col='red') 
+abline(v=median(Y),col='blue',lty=2)
+legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+
+plot(ecdf(Y),main=title2)
+abline(v=mean(Y),col='red') 
+abline(v=median(Y),col='blue',lty=2)
+legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
+}
+
+unif2(1000,a=0,b=12,title1='UNIFORM Distribution\'s PDF figure',title2='UNIFORM Distribution\'s CDF figure')
+```
+
+3 & 4.
+
+```{r}
+unif34<-function(n,size,a,b){
+
+x=as.data.frame(replicate(n,runif(size,a,b)))
+
+# arithmetic mean & ge mean
+ar_mean <- colMeans(x)
+ge_mean <- exp(colMeans(log(x))) 
+
+plot(x=ar_mean,y=ge_mean,main='Arithmetic Mean VS Geometric Mean ',xlab = "Arithmetic Mean",  ylab = "Geometric Mean ")
+abline(0,1,col='red')
+
+hist(ar_mean-ge_mean,main= 'The Difference between arithmetic mean & geometric mean',xlab='Difference: Arithmetic Mean - Geometric Mean')
+}
+
+unif34(1000,size=100,a=0,b=12)
+```
+
+
+# Part 2 (OPTIONAL)
+
+Show that if *X*<sub>*i*</sub> \> 0 for all *i*, then the arithmetic mean is greater than or equal to the geometric mean.
+
+  
+
+**Answer**
+
+```{r}
+ans2<- function(number,i){
+  ar_mean = NA
+  ge_mean = NA
+  for (n in 1:i){
+    X=sample(number,i,replace=T)
+    ar_mean[n]=mean(X)
+    ge_mean[n]=exp(mean(log(X)))
+}
+  unique(ifelse(ar_mean >=ge_mean ,"Prove","Unprove"))
+}
+ans2(1000,1000)
+```
+
+According to the simulation above, we can know that: if *X*<sub>*i*</sub> \> 0 for all *i*, then the arithmetic mean is greater than or equal to the geometric mean.
+
+# Part 3
+
+What is the correct relationship between `E[log(X)]` and `log(E[X])`? Is one always larger? Equal? Explain your answer.
+
+**1. Analytic Answer**
+
+Recall that:
+
+$$e^x\geq 1+x$$
+
+so, $$E\left[e^{Y}\right]=e^{ E(Y)}E\left[e^{Y- E(Y)}\right]\geq  e^{E(Y)} E\left[1+{Y- E(Y)}\right] = e^{E(Y)}$$.
+
+which means:
+
+$$e^{E(Y)}\leq E\left[e^{Y}\right]$$
+
+Now letting $Y=\log X$, we have: 
+
+$$e^{E(\log X)}\leq E\left[e^{\log X}\right]=E(X)$$
+
+Now take logs of both sides, we get: 
+
+$$E[\log (X)]\leq\log[E(X)]$$
+
+**Conclusion** 
+
+the relationship between `E[log(X)]` and
+`log(E[X])` is that: `E[log(X)]` always less or equal than `log(E[X])`
+
+    
+
+**2. Simulation Answer**
+
+```{r}
+ans3<- function(number,i){
+  mean_log = NA
+  log_mean = NA
+   diff=NA
+  for (n in 1:i){
+    X=sample(number,i,replace=T)
+    mean_log[n]=mean(log(X))
+    log_mean[n]=log(mean(X))
+    diff[n]=mean_log[n]-log_mean[n]
+}
+  if (max(diff)<0){
+    print('E[log(X)] is always smaller than log(E[X])')
+  }
+   if (min(diff)>0){
+     print('E[log(X)] is always larger than log(E[X])')
+   }
+}
+ans3(1000,1000)
+```
+ 
+From the simulation above, we can find out that the max `E[log(X)] - log(E[X])` is always less than 0. So `log(E[X])` is always larger.
