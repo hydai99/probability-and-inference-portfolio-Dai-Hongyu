@@ -57,7 +57,7 @@ In this blog, I am going to use simulation and analytic methods to compare the p
 
 3. Load Packages
 
-```{r}
+```{r,message=FALSE}
 library(dplyr)
 library(data.table)
 library(ggplot2)
@@ -117,9 +117,11 @@ ANS1 <- pnbinom(3, 4, pb)
 
 + The probability of winning without home advantage is slightly greater than that of winning with home advantage. It can be seen that home field advantage do have an impact on winning the world series.
 
-
++ The difference between home-field advantage with and without is -0.004066825. With the Braves' home in Atlanta and each of their games being played in the sequence {NY, NY, ATL, ATL, ATL, NYC, NYC}, it makes sense that the probability with home-field advantage would be slightly lower than the probability without it.
 
 ## Calculate the same probabilities as the previous question by simulation.
+
+I set `times` variables as simulation times. In this case, I will simulate 10000 times to ensure the to reduce the simulation error.
 
 ```{r}
 set.seed(10)
@@ -143,6 +145,7 @@ for (i in 1:times){
 }
 (ans2 <- mean(result2))
 ```
++ According to the simulation solution, the probability with home-field advantage is 0.6072 when $P_B$ = 0.55.
 
 ```{r}
 set.seed(20)
@@ -162,8 +165,9 @@ for (i in 1:times){
 }
 (ANS2 <- mean(RESULT2))
 ```
++ According to the simulation solution, the probability with home-field advantage is 0.6002 when $P_B$ = 0.55.
 
-By simulation solution, we can also get the answer. With and without home advantage, the Braves' probability of winning is 0.6072 and 0.6002 respectively. 
+**Conclusion:** By simulation solution, we can also get the probability when $P_B$=0.55. With and without home advantage, the Braves' probability of winning is 0.6072 and 0.6002 respectively. 
 
 ## What is the absolute and relative error for your simulation in the previous question?
 
@@ -179,7 +183,23 @@ According to abs_error=$|p̂−p|$, rel_error = $|p̂−p|/p$, we can get the an
 (rel_err_NoHFA <- abs(ANS2-ANS1)/ANS1)
 ```
 
++ In the simulation with home filed advantage, the absolute error is 0.002979028, and the relative error is 0.004930362.
+
++ In the simulation without home filed advantage, the absolute error is 0.008087797, and the relative error is 0.013296.
+
 ## Does the difference in probabilities (with vs without home field advantage) depend on *P*<sub>*B*</sub>? (Generate a plot to answer this question.)
+
+Setup for this question: 
+
+1) The sequence of game locations is `{NYC, NYC, ATL, ATL, ATL, NYC, NYC}`.
+
+2) `advantage_multiplier` is 1.1.
+
+3) Calculate the $p_b$ in the range (0.5,1) with a break of 0.01.
+
+3) `diff` is the difference between home field advantage probability and without it.
+
+You can see below how Probability of the Braves Winning a Head-to-Head Matchup and Difference in Probabilities (Home Field Advantage vs Without) relate to each other.
 
 ```{r}
 PB <- seq(0.5,1,by = 0.01)
@@ -208,10 +228,7 @@ for (k in seq_along(PB)){
 
 #2) Without home field advantage
 ANS4 <- pnbinom(3, 4, PB) 
-```
 
-
-```{r}
 # Creat a point plot
 ggplot()+
   geom_point(aes(x=PB,y=ans4-ANS4))+
@@ -226,9 +243,19 @@ max(ans4-ANS4)
 PB[which(near(ans4-ANS4,0.01775953))]
 ```
 
-From the plot, we can seen that *P*<sub>*B*</sub> do have impact on the difference in probabilities (with vs without home field advantage). When `pb` was between 0.5 and 0.71, `pb` was positively correlated with `ans4-ANS4`. When `pb` increased from 0.71 to 1, `pb` was negatively correlated with `ans4-ANS4`, gradually converging to 0.
++ From the plot, we can seen that *P*<sub>*B*</sub> do have impact on the difference in probabilities (with vs without home field advantage). When `pb` was between 0.5 and 0.71, `pb` was positively correlated with `ans4-ANS4`. When `pb` increased from 0.71 to 1, `pb` was negatively correlated with `ans4-ANS4`, gradually converging to 0.
 
 ## Does the difference in probabilities (with vs without home field advantage) depend on the advantage factor? 
+
+Setup for this question: 
+
+1) $p_b$ is 0.55.
+
+2) Calculate the `advantage_multiplier` in the range (1,2) with a break of 0.01.
+
+3) `diff` is the difference between home field advantage probability and without it.
+
+You can see the relationship between the Home Field Advantage Multiplier and Difference in Probabilities in the plot below:
 
 ```{r}
 ## 1) With home field advantage
@@ -252,9 +279,7 @@ for (m in seq_along(advantage_multiplier)){
   }
   ans5[m] <- as.numeric(apo[, sum(p), overall_outcome][1,2])
 }
-```
 
-```{r}
 # Creat a point plot
 ggplot()+
   geom_point(aes(x=advantage_multiplier,y=ans5-ANS1))+
@@ -265,4 +290,4 @@ ggplot()+
   theme(panel.border = element_blank()) 
 ```
 
-From the plot above, it can be seen that, when advantage multiplier incresing from 1 to 2, the difference in probabilities (with vs without home field advantage) is descresing. So we can consider that the difference in probabilities (with vs without home field advantage) depend on the advantage factor.
++ From the plot above, it can be seen that, when `advantage multiplier` increased from 1 to 2, the difference in probabilities (with vs without home field advantage) is descresd. So we can consider that the difference in probabilities (with vs without home field advantage) depend on the advantage factor.
