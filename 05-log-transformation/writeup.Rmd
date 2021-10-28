@@ -20,7 +20,7 @@ In this blog, I am to answer a series of questions related to the transformation
 
 1. Geometic Means = $\sqrt[n]{x_1 \cdot x_2 \cdots x_n}$. The sample size used subsequently in this blog is too large for the formula to be used in R, so I will use the logarithm first and then exponentiate to calculate the geometric mean.
 
-2. The logarithmized variable must be greater than 0all variable in log should larger than 0.
+2. The logarithmized variable must be greater than 0.
 
 # Part 1
 

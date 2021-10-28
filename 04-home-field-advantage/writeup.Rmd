@@ -165,7 +165,7 @@ for (i in 1:times){
 }
 (ANS2 <- mean(RESULT2))
 ```
-+ According to the simulation solution, the probability with home-field advantage is 0.6002 when $P_B$ = 0.55.
++ According to the simulation solution, the probability without home-field advantage is 0.6002 when $P_B$ = 0.55.
 
 **Conclusion:** By simulation solution, we can also get the probability when $P_B$=0.55. With and without home advantage, the Braves' probability of winning is 0.6072 and 0.6002 respectively. 
 
