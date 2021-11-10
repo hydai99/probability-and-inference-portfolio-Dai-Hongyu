@@ -15,3 +15,7 @@
 [Assignment 04](/04-home-field-advantage)
 
 [Assignment 05](/05-log-transformation)
+
+[Assignment 06](/06-order-statistics)
+
+[Assignment 07](/07-mle-and-mm)
