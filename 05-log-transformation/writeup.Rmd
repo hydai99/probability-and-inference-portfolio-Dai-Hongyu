@@ -87,7 +87,7 @@ abline(v=median(Y),col='blue',lty=2)
 legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
 }
 
-gamma2(1000,3,1,title1='GAMMA Distribution\'s PDF figure',title2='GAMMA Distribution\'s CDF figure')
+gamma2(10000,3,1,title1='GAMMA Distribution\'s PDF figure',title2='GAMMA Distribution\'s CDF figure')
 ```
 
 3 & 4.
@@ -107,7 +107,7 @@ abline(0,1,col='red')
 hist(ar_mean-ge_mean,main= 'The Difference between arithmetic mean & geometric mean',xlab='Difference: Arithmetic Mean - Geometric Mean')
 }
 
-gamma34(1000,size=100,shape = 3, scale = 1)
+gamma34(10000,size=100,shape = 3, scale = 1)
 ```
 
 
@@ -162,7 +162,7 @@ abline(v=median(Y),col='blue',lty=2)
 legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
 }
 
-lnorm2(1000,-1,1,title1='Log NORMA Distribution\'s PDF figure',title2='Log NORMA Distribution\'s CDF figure')
+lnorm2(10000,-1,1,title1='Log LORMAL Distribution\'s PDF figure',title2='Log LORMAL Distribution\'s CDF figure')
 ```
 
 3 & 4.
@@ -182,7 +182,7 @@ abline(0,1,col='red')
 hist(ar_mean-ge_mean,main= 'The Difference between arithmetic mean & geometric mean',xlab='Difference: Arithmetic Mean - Geometric Mean')
 }
 
-lnorm34(1000,size=100,μ=-1,σ=1)
+lnorm34(10000,size=100,μ=-1,σ=1)
 ```
 
 ### Distribution 3
@@ -234,7 +234,7 @@ abline(v=median(Y),col='blue',lty=2)
 legend("topleft",c("mean","median"),col=c("red","blue"),lty=c(1,2),bty = "n")
 }
 
-unif2(1000,a=0,b=12,title1='UNIFORM Distribution\'s PDF figure',title2='UNIFORM Distribution\'s CDF figure')
+unif2(10000,a=0,b=12,title1='UNIFORM Distribution\'s PDF figure',title2='UNIFORM Distribution\'s CDF figure')
 ```
 
 3 & 4.
@@ -254,7 +254,7 @@ abline(0,1,col='red')
 hist(ar_mean-ge_mean,main= 'The Difference between arithmetic mean & geometric mean',xlab='Difference: Arithmetic Mean - Geometric Mean')
 }
 
-unif34(1000,size=100,a=0,b=12)
+unif34(10000,size=100,a=0,b=12)
 ```
 
 
