@@ -19,3 +19,5 @@
 [Assignment 06](/06-order-statistics)
 
 [Assignment 07](/07-mle-and-mm)
+
+[Assignment 08](/08-coverage-probability)
