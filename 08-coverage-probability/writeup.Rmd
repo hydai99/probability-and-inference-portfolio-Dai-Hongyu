@@ -72,28 +72,29 @@ Specifically, there are steps:
 3) Using `mle()` function to estimate the parameters of the distribution.
 
 ```{r use MLE to estimate distribution}
-#1) Constructing the likelihood function `LL`.
-LL <- function(mean,sd){
-   fs <- dnorm(data ,mean , sd , log = TRUE    )   
-   -sum(fs) 
+
+est_mle <- function(data){
+
+  #1) Constructing the likelihood function `LL`.
+  LL <- function(mean,sd){
+     fs <- dnorm(data ,mean , sd , log = TRUE    )   
+     -sum(fs) 
+  }
+
+  # 2) Calculate parameters.
+  xbar=mean(data)
+  sd=sd(data) 
+
+  # 3) Using `mle()` function to estimate the parameters of the distribution.
+  fit <- mle(minuslogl = LL, start = list(mean=xbar, sd=sd))
+  
+  
+  # Estimated results presentation
+  mean = coef(fit)[1]
+  sd = coef(fit)[2]
+  
+  return (c(mean,sd))
 }
-
-# 2) Calculate parameters.
-xbar=mean(data)
-sd=sd(data) 
-
-# 3) Using `mle()` function to estimate the parameters of the distribution.
-fit <- mle(minuslogl = LL, start = list(mean=xbar, sd=sd))
-
-
-# Estimated results presentation
-mean = coef(fit)[1]
-sd = coef(fit)[2]
-
-summary(fit)
-plot(density(data),col="green",ylim=c(0,0.5))
-hist(data, freq = FALSE,breaks = 20, main = " ", add=TRUE)
-curve(dnorm(x, mean = coef(fit)[1], sd = coef(fit)[2]), add = TRUE, col = "orange")
 ```
 
 2. Using boostrap method to approximate the sampling distribution of the median, conditional on the estimate of the distribution in the previous step. And calculate a 95% confidence interval from the approximated sampling distribution.
@@ -106,17 +107,17 @@ It is a statistical procedure that resamples a single dataset to create many sim
 After obtaining the approximated sampling distribution by the bootstrap method, I will use the `quantile()` function to obtain values corresponding to 0.025 and 0.975, which are 95% confidence intervals.
 
 ```{r}
-boot_ci <- function(data, N=201,summary = "median"){
+boot_ci <- function(est_mle,N=201,summary = "median"){
   
   # Hard coded number of draws
-  R <- 4000
+  R <- 5000
   
   # Set median as default summary measure
   sm <- get(summary) 
   
   sampdist <- rep(NA, R)
   for(i in 1:R){
-    b <- rnorm(N,mean = coef(fit)[1], sd = coef(fit)[2]) # Based on the estimated distribution conditions in the previous step. Using the parameters estimated by mle()
+    b <- rnorm(N,mean=est_mle[1], sd=est_mle[2]) # Based on the estimated distribution conditions in the previous step. Using the parameters estimated by mle()
     sampdist[i] <- sm(b)
   }
   
@@ -125,11 +126,6 @@ boot_ci <- function(data, N=201,summary = "median"){
 }
 ```
 
-For a single simulation, its 95% confidence intervals is as follow:
-
-```{r results presentation}
-boot_ci(data)
-```
 
 4. Calculate the coverage probability.
 
@@ -144,8 +140,6 @@ capture_median <- function(ci){
    1*(ci[1] < 0 & 0 < ci[2])
 
 }
-
-capture_median (boot_ci(data))
 ```
 
 
@@ -159,13 +153,14 @@ In this simulation, I chose 4000 simulations with a sample size of 201.
 
 The results are shown below:
 
-```{r}
-M <- 4000  #simulation times.
+```{r ,warning=FALSE}
+set.seed(123)
+M <- 5000  #simulation times.
 
 captures <- rep(NA, M)
 for(i in 1:M){
   captures[i] <- 
-    N %>% generate_data %>% boot_ci %>% capture_median
+    N %>% generate_data %>% est_mle %>%  boot_ci %>% capture_median
 }
 
 (capture_prob <- mean(captures))
