@@ -1,0 +1,174 @@
+---
+title: "Coverage Probability"
+author: "Hongyu Dai"
+date: "2021/11/28"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+
+Coverage probability is an important operating characteristic of methods for constructing interval estimates, particularly confidence intervals.
+
+# Introduction
+
+In this blog, I am going to perform a simulation to calculate the coverage probability of the 95% confidence interval of the median when computed from *F̂*<sub>*X*</sub><sup>*m**l**e*</sup>. I will explain coverage probability and my simulation.
+
+Definition
+---------------
+
+For the purpose of this blog, I am going to define:
+
+1. Confidence Interval: the 95% confidence interval of the median to be the middle 95% of sampling distribution of the median. Similarly, the 95% confidence interval of the mean, standard deviation, etc. is the middle 95% of the respective sampling distribution.
+
+2. Coverage Probability: the coverage probability as the long run proportion of intervals that capture the population parameter of interest. Conceptualy, one can calculate the coverage probability with the following steps
+
+# Step
+
+In this blog, I will do the simulation by the following steps:
+
+1.  Generate a sample of size *N* from a known distribution
+2.  Construct a confidence interval
+3.  Compare interval to truth capture/ no capture: determine if the confidence captures the parameter
+4.  Repeat steps (1) - (3) many times. 
+5.  Calculate capture rate: Estimate the coverage probability as the proportion of samples for which the confidence interval captured the parameter.
+
+Idealy, a 95% confidence interval will capture the population parameter of interest in 95% of samples.
+
+# Calculation & Simulation
+
+```{r message = F}
+library(tidyverse)
+library(stats4)
+```
+
+1. Generate a single sample from a standard normal distribution.
+
+```{r}
+generate_data <- function(N){ 
+  # Hard coded standard normal distribution
+  rnorm(N,mean=0,sd=1) 
+}
+
+N=201
+data=generate_data(N)
+```
+
+2. Use MLE to estimate distribution. 
+
+In the `mle()` function, there are two main parameters. The first specifies a function to calculate the log likelihood, and it is below `LL()` function. The parameters of the function must be parameters. 
+
+For this standard normal distribution case, I will use `mean` and `sd` parameters, which  involved in standard normal distribution.
+
+The calculation uses an iterative process, starting from the initial guess of mle, and then refining the guess in turn until it converges to mle. 
+
+The second parameter start of mle() specifies initial guess, that is, the relationship formula between the parameters mentioned above and the mean & variance.
+
+Specifically, there are steps:
+1) Constructing the likelihood function `LL`.
+2) Calculate parameters.
+3) Using `mle()` function to estimate the parameters of the distribution.
+
+```{r use MLE to estimate distribution}
+#1) Constructing the likelihood function `LL`.
+LL <- function(mean,sd){
+   fs <- dnorm(data ,mean , sd , log = TRUE    )   
+   -sum(fs) 
+}
+
+# 2) Calculate parameters.
+xbar=mean(data)
+sd=sd(data) 
+
+# 3) Using `mle()` function to estimate the parameters of the distribution.
+fit <- mle(minuslogl = LL, start = list(mean=xbar, sd=sd))
+
+
+# Estimated results presentation
+mean = coef(fit)[1]
+sd = coef(fit)[2]
+
+summary(fit)
+plot(density(data),col="green",ylim=c(0,0.5))
+hist(data, freq = FALSE,breaks = 20, main = " ", add=TRUE)
+curve(dnorm(x, mean = coef(fit)[1], sd = coef(fit)[2]), add = TRUE, col = "orange")
+```
+
+2. Using boostrap method to approximate the sampling distribution of the median, conditional on the estimate of the distribution in the previous step. And calculate a 95% confidence interval from the approximated sampling distribution.
+
+In this blog, I will use Boostrap method to approximate the sampling distribution of the median.
+
+The bootstrap method is a resampling technique used to estimate statistics by sampling a dataset with replacement.
+It is a statistical procedure that resamples a single dataset to create many simulated samples. This process allows people to calculate standard errors, construct confidence intervals, and perform hypothesis testing for numerous types of sample statistics. Bootstrap methods are alternative approaches to traditional hypothesis testing and are notable for being easier to understand and valid for more conditions.
+
+After obtaining the approximated sampling distribution by the bootstrap method, I will use the `quantile()` function to obtain values corresponding to 0.025 and 0.975, which are 95% confidence intervals.
+
+```{r}
+boot_ci <- function(data, N=201,summary = "median"){
+  
+  # Hard coded number of draws
+  R <- 4000
+  
+  # Set median as default summary measure
+  sm <- get(summary) 
+  
+  sampdist <- rep(NA, R)
+  for(i in 1:R){
+    b <- rnorm(N,mean = coef(fit)[1], sd = coef(fit)[2]) # Based on the estimated distribution conditions in the previous step. Using the parameters estimated by mle()
+    sampdist[i] <- sm(b)
+  }
+  
+  # Hard coded symmetric density interval
+  quantile(sampdist, c(0.025, 0.975))
+}
+```
+
+For a single simulation, its 95% confidence intervals is as follow:
+
+```{r results presentation}
+boot_ci(data)
+```
+
+4. Calculate the coverage probability.
+
+The coverage probability is an operating characteristic of methods or algorithms that create confidence intervals. If one repeatedly draws a sample of size $N$ from the population and constructs a confidence interval, the coverage probability is the proportion of intervals that capture the population parameter of interest.
+
+In this case, I compare interval to truth capture/ no capture. So, after apply `capture_median()` function, if the confidence interval does capture estimated median, count 1, otherwise, count 0.
+
+```{r}
+capture_median <- function(ci){
+  
+  # Hard coded 0 as parameter of interest
+   1*(ci[1] < 0 & 0 < ci[2])
+
+}
+
+capture_median (boot_ci(data))
+```
+
+
+5. Simulation
+
+In the simulation, we can vary the number of simulations and the sample size to learn more about the operating characteristics of this method for constructing the 95% confidence interval.
+
+This method shows the probability of coverage by calculating the average of M simulations.
+
+In this simulation, I chose 4000 simulations with a sample size of 201.
+
+The results are shown below:
+
+```{r}
+M <- 4000  #simulation times.
+
+captures <- rep(NA, M)
+for(i in 1:M){
+  captures[i] <- 
+    N %>% generate_data %>% boot_ci %>% capture_median
+}
+
+(capture_prob <- mean(captures))
+```
+
+
