@@ -51,9 +51,6 @@ generate_data <- function(N){
   # Hard coded standard normal distribution
   rnorm(N,mean=0,sd=1) 
 }
-
-N=201
-data=generate_data(N)
 ```
 
 2. Use MLE to estimate distribution. 
@@ -95,7 +92,10 @@ est_mle <- function(data){
   
   return (c(mean,sd))
 }
+
+
 ```
+
 
 2. Using boostrap method to approximate the sampling distribution of the median, conditional on the estimate of the distribution in the previous step. And calculate a 95% confidence interval from the approximated sampling distribution.
 
@@ -127,7 +127,7 @@ boot_ci <- function(est_mle,N=201,summary = "median"){
 ```
 
 
-4. Calculate the coverage probability.
+3. Calculate the coverage probability.
 
 The coverage probability is an operating characteristic of methods or algorithms that create confidence intervals. If one repeatedly draws a sample of size $N$ from the population and constructs a confidence interval, the coverage probability is the proportion of intervals that capture the population parameter of interest.
 
@@ -135,21 +135,41 @@ In this case, I compare interval to truth capture/ no capture. So, after apply `
 
 ```{r}
 capture_median <- function(ci){
-  
   # Hard coded 0 as parameter of interest
    1*(ci[1] < 0 & 0 < ci[2])
-
 }
 ```
 
 
-5. Simulation
+4. Simulation
 
 In the simulation, we can vary the number of simulations and the sample size to learn more about the operating characteristics of this method for constructing the 95% confidence interval.
 
 This method shows the probability of coverage by calculating the average of M simulations.
 
-In this simulation, I chose 4000 simulations with a sample size of 201.
+**A single sample**
+
+Now I will show the results of each simulation after the above three steps with a single sample. As follows:
+
+```{r warning=FALSE}
+
+N=201
+data <- generate_data(N)
+
+(t1 <- data %>% est_mle)
+plot(density(data),col="green",ylim=c(0,0.5))
+hist(data, freq = FALSE,breaks = 20, main = " ", add=TRUE)
+curve(dnorm(x, mean =t1[1], sd = t1[2]), add = TRUE, col = "orange")
+
+(t2 <- t1 %>% boot_ci )
+
+(t2 %>% capture_median)
+
+```
+
+**5000 times simulations**
+
+In this simulation, I chose 5000 simulations with a sample size of 201.
 
 The results are shown below:
 
@@ -167,3 +187,16 @@ for(i in 1:M){
 ```
 
 
+5. How to change the simulation to learn more about the operating characteristics of your chosen method for constructing the 95% confidence interval.
+
+In order to deepen the understanding of the operational characteristics of the method of constructing the 95% confidence interval, there are several ways to do this:
+
++ change the number of simulation times.
+
++ change the type of distribution and the parameters of the distribution. For example, changing the standard normal distribution to a gamma distribution, with shape=3, scale=3.
+
++ change the estimation method. For example, using the MM method for parameter estimation.
+
++ changing the approximate sampling method.
+
+By comparing the results before and after the change in method, a more in-depth understanding of the operational characteristics of this construct method can be achieved.
