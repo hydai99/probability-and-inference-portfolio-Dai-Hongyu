@@ -21,3 +21,5 @@
 [Assignment 07](/07-mle-and-mm)
 
 [Assignment 08](/08-coverage-probability)
+
+[Final Exam](/99-final-exam)
